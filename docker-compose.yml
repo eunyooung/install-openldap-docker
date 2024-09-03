@@ -1,0 +1,36 @@
+name: openldap
+
+services:
+  openldap:
+    image: osixia/openldap
+    container_name: openldap
+    environment:
+      - LDAP_ORGANISATION=EY
+      - LDAP_DOMAIN=ey.com
+      - "LDAP_BASE_DN=dc=ey,dc=com"
+      - LDAP_ADMIN_PASSWORD=admin
+    ports:
+      - 389:389
+      - 636:636
+    volumes:
+      - /data/openldap/data:/var/lib/ldap
+      - /data/openldap/config:/etc/ldap/slapd.d
+    networks:
+      - openldap
+
+  phpldapadmin:
+    image: osixia/phpldapadmin
+    container_name: phpldapadmin
+    environment:
+      - PHPLDAPADMIN_LDAP_HOSTS=openldap
+    ports:
+      - 6443:443
+    networks:
+      - openldap
+    depends_on:
+      - openldap
+
+networks:
+  openldap:
+    external: true
+    name: openldap
